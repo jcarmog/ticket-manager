@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: ticket-manager
+  datasource:
+    url: jdbc:mysql://192.168.0.154:3306/ticket_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:972791132937-3isnetor9a0u9ub2ip40n08jl2h1mj5h.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET: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}
+            scope:
+              - email
+              - profile
+        #   azure-active-directory:
+        #     client-id: ${AZURE_CLIENT_ID:placeholder}
+        #     client-secret: ${AZURE_CLIENT_SECRET:placeholder}
+        #     scope:
+        #       - openid
+        #       - profile
+        #       - email
+        # provider:
+        #   azure-active-directory:
+        #     issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:placeholder}/v2.0
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+  api-docs:
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true

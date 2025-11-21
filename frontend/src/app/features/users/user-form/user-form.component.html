@@ -1,0 +1,46 @@
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800">Edit User</h2>
+            <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary"
+                routerLink="/users"></p-button>
+        </div>
+
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <div class="space-y-2">
+                <label for="name" class="block text-sm font-medium text-slate-700">Name</label>
+                <input pInputText id="name" formControlName="name" class="w-full" />
+            </div>
+
+            <div class="space-y-2">
+                <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
+                <input pInputText id="email" formControlName="email" class="w-full" [readonly]="true" />
+                <small class="text-slate-500">Email cannot be changed.</small>
+            </div>
+
+            <div class="space-y-2">
+                <label for="role" class="block text-sm font-medium text-slate-700">Role</label>
+                <p-dropdown [options]="roles" formControlName="role" styleClass="w-full" placeholder="Select Role">
+                </p-dropdown>
+            </div>
+
+            <div class="space-y-2">
+                <label for="teams" class="block text-sm font-medium text-slate-700">Teams</label>
+                <p-multiSelect [options]="teams()" formControlName="teams" optionLabel="name" optionValue="id"
+                    display="chip" styleClass="w-full" placeholder="Select Teams">
+                </p-multiSelect>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="active" formControlName="active"
+                    class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <label for="active" class="block text-sm font-medium text-slate-700">Active</label>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <p-button label="Cancel" severity="secondary" routerLink="/users"></p-button>
+                <p-button label="Save Changes" type="submit" [loading]="loading()"></p-button>
+            </div>
+        </form>
+    </div>
+</div>

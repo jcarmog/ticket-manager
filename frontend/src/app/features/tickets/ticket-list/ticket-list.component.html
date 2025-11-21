@@ -1,0 +1,139 @@
+<div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-4">
+            <h2 class="text-xl font-bold text-slate-800">Tickets</h2>
+            <p-selectButton [options]="filterOptions" [(ngModel)]="currentFilter" optionLabel="label"
+                optionValue="value" (onChange)="loadTickets()">
+            </p-selectButton>
+        </div>
+        <p-button label="New Ticket" icon="pi pi-plus" routerLink="/tickets/new"></p-button>
+    </div>
+
+    <p-accordion [multiple]="true" [(activeIndex)]="activeIndices">
+        <p-accordionTab *ngFor="let status of ticketStatuses"
+            [header]="getStatusLabel(status) + ' (' + getTicketsByStatus(status).length + ')'">
+            <p-table [value]="getVisibleTicketsByStatus(status)" [tableStyle]="{ 'min-width': '60rem' }">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Title</th>
+                        <th>Priority</th>
+                        <th>Assigned To</th>
+                        <th>Team</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-ticket>
+                    <tr>
+                        <td>{{ ticket.ticketNumber }}</td>
+                        <td>{{ ticket.title }}</td>
+                        <td>
+                            <p-tag [value]="getPriorityLabel(ticket.priority)"
+                                [severity]="getPrioritySeverity(ticket.priority)"></p-tag>
+                        </td>
+                        <td>
+                            <div *ngIf="ticket.assignedTo" class="flex items-center gap-2">
+                                <p-avatar [image]="ticket.assignedTo.avatarUrl"
+                                    [label]="!ticket.assignedTo.avatarUrl ? ticket.assignedTo.name.charAt(0) : undefined"
+                                    shape="circle" [style]="{'background-color': '#e0e7ff', 'color': '#4338ca'}">
+                                </p-avatar>
+                                <span>{{ ticket.assignedTo.name }}</span>
+                            </div>
+                            <span *ngIf="!ticket.assignedTo" class="text-slate-400 italic">Unassigned</span>
+                        </td>
+                        <td>
+                            <span *ngIf="ticket.assignedTeam">{{ ticket.assignedTeam.name }}</span>
+                            <span *ngIf="!ticket.assignedTeam" class="text-slate-400 italic">-</span>
+                        </td>
+                        <td>{{ ticket.createdAt | date:'mediumDate' }}</td>
+                        <td>
+                            <div class="flex gap-3">
+                                <p-button icon="pi pi-eye" [rounded]="true" [outlined]="true" severity="secondary"
+                                    [routerLink]="['/tickets', ticket.id]" pTooltip="View Ticket"
+                                    tooltipPosition="top"></p-button>
+
+                                <p-button *ngIf="canStart(ticket)" icon="pi pi-play" [rounded]="true" severity="success"
+                                    (click)="startTicket(ticket)" pTooltip="Start Progress"
+                                    tooltipPosition="top"></p-button>
+
+                                <p-button *ngIf="canPause(ticket)" icon="pi pi-pause" [rounded]="true"
+                                    severity="warning" (click)="openPauseDialog(ticket)" pTooltip="Pause Ticket"
+                                    tooltipPosition="top"></p-button>
+
+                                <p-button *ngIf="canAssignToMe(ticket)" icon="pi pi-user-plus" [rounded]="true"
+                                    severity="info" (click)="assignToMe(ticket)" pTooltip="Assign to Me"
+                                    tooltipPosition="top"></p-button>
+
+                                <p-button *ngIf="canUnassign(ticket)" icon="pi pi-user-minus" [rounded]="true"
+                                    [outlined]="true" severity="danger" (click)="unassign(ticket)" pTooltip="Unassign"
+                                    tooltipPosition="top"></p-button>
+
+                                <p-button icon="pi pi-arrow-right" [rounded]="true" [outlined]="true"
+                                    severity="secondary" (click)="openForwardDialog(ticket)" pTooltip="Forward Ticket"
+                                    tooltipPosition="top"></p-button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="7" class="text-center p-4 text-slate-500">No tickets in this status.</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-accordionTab>
+    </p-accordion>
+</div>
+
+<p-dialog header="Forward Ticket" [(visible)]="forwardDialogVisible" [modal]="true"
+    [breakpoints]="{'960px': '75vw', '640px': '90vw'}" [style]="{width: '50vw'}"
+    [contentStyle]="{'overflow': 'visible'}">
+    <div class="flex flex-col gap-4" style="min-height: 200px;">
+        <label for="team" class="font-semibold">Select Team</label>
+        <p-dropdown [options]="teams()" [(ngModel)]="selectedTeamId" optionLabel="name" optionValue="id"
+            placeholder="Select a Team" styleClass="w-full" appendTo="body">
+        </p-dropdown>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" (click)="forwardDialogVisible = false" [outlined]="true"
+            severity="secondary"></p-button>
+        <p-button label="Forward" (click)="forwardTicket()" [disabled]="!selectedTeamId"></p-button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Start Ticket" [(visible)]="startDialogVisible" [modal]="true" [style]="{width: '30vw'}">
+    <div class="flex flex-col gap-4">
+        <p class="text-slate-600 mb-2">Please provide estimation details to start this ticket.</p>
+
+        <div class="flex flex-col gap-2">
+            <label for="estimatedTime" class="font-semibold">Estimated Time (e.g. 2h, 3d)</label>
+            <input pInputText id="estimatedTime" [(ngModel)]="estimation.time" placeholder="e.g. 4h" />
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <label for="estimatedFinishDate" class="font-semibold">Estimated Finish Date</label>
+            <p-calendar [(ngModel)]="estimation.date" dateFormat="dd/mm/yy" [minDate]="minDate" [showIcon]="true"
+                appendTo="body"></p-calendar>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" (click)="startDialogVisible = false" [outlined]="true" severity="secondary"></p-button>
+        <p-button label="Start Ticket" (click)="confirmStartTicket()"
+            [disabled]="!estimation.time || !estimation.date"></p-button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Pause Ticket" [(visible)]="pauseDialogVisible" [modal]="true" [style]="{width: '30vw'}">
+    <div class="flex flex-col gap-4">
+        <p class="text-slate-600 mb-2">Please provide a justification for pausing this ticket.</p>
+        <div class="flex flex-col gap-2">
+            <label for="pauseReason" class="font-semibold">Reason</label>
+            <textarea pInputTextarea id="pauseReason" [(ngModel)]="pauseReason" rows="3" class="w-full"></textarea>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" (click)="pauseDialogVisible = false" [outlined]="true" severity="secondary"></p-button>
+        <p-button label="Pause Ticket" (click)="confirmPauseTicket()" [disabled]="!pauseReason"></p-button>
+    </ng-template>
+</p-dialog>

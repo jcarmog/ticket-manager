@@ -1,0 +1,65 @@
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800">New Team</h2>
+            <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary"
+                routerLink="/teams"></p-button>
+        </div>
+
+        <form [formGroup]="teamForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <div class="space-y-2">
+                <label for="name" class="block text-sm font-medium text-slate-700">Team Name</label>
+                <input pInputText id="name" formControlName="name" class="w-full" placeholder="e.g. Engineering" />
+            </div>
+
+            <div class="space-y-2">
+                <label for="description" class="block text-sm font-medium text-slate-700">Description</label>
+                <textarea pInputTextarea id="description" formControlName="description" rows="3" class="w-full"
+                    placeholder="Team purpose..."></textarea>
+            </div>
+
+            <div class="space-y-2">
+                <label for="leader" class="block text-sm font-medium text-slate-700">Team Leader</label>
+                <p-dropdown [options]="users()" formControlName="leader" optionLabel="name" [showClear]="true"
+                    placeholder="Select a Leader" styleClass="w-full" appendTo="body">
+                    <ng-template pTemplate="selectedItem" let-selectedOption>
+                        <div class="flex items-center gap-2" *ngIf="selectedOption">
+                            <div
+                                class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                                {{ selectedOption.name.charAt(0) }}
+                            </div>
+                            <div>{{ selectedOption.name }}</div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="item" let-user>
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                                {{ user.name.charAt(0) }}
+                            </div>
+                            <div>{{ user.name }}</div>
+                        </div>
+                    </ng-template>
+                </p-dropdown>
+            </div>
+
+            <div class="space-y-2">
+                <label for="members" class="block text-sm font-medium text-slate-700">Members</label>
+                <p-multiSelect [options]="users()" formControlName="members" optionLabel="name" optionValue="id"
+                    display="chip" styleClass="w-full" placeholder="Select Members">
+                </p-multiSelect>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="active" formControlName="active"
+                    class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                <label for="active" class="block text-sm font-medium text-slate-700">Active</label>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <p-button label="Cancel" severity="secondary" routerLink="/teams"></p-button>
+                <p-button label="Create Team" type="submit" [loading]="loading()"></p-button>
+            </div>
+        </form>
+    </div>
+</div>

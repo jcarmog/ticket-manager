@@ -1,0 +1,113 @@
+<div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-800">{{ isEditMode() ? 'Edit Ticket' : 'New Ticket' }}</h2>
+            <div class="flex gap-2">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary"
+                    routerLink="/tickets"></p-button>
+            </div>
+        </div>
+
+        <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="space-y-6">
+            <div class="space-y-2">
+                <label for="title" class="block text-sm font-medium text-slate-700">Title</label>
+                <input pInputText id="title" formControlName="title" class="w-full"
+                    placeholder="Brief summary of the issue" />
+            </div>
+
+            <div class="space-y-2">
+                <label for="priority" class="block text-sm font-medium text-slate-700">Priority</label>
+                <p-dropdown [options]="priorityOptions" formControlName="priority" optionLabel="label"
+                    optionValue="value" styleClass="w-full" placeholder="Select Priority">
+                </p-dropdown>
+            </div>
+
+            <div class="space-y-2">
+                <label for="assignedTeam" class="block text-sm font-medium text-slate-700">Team</label>
+                <p-autoComplete formControlName="assignedTeam" [suggestions]="filteredTeams"
+                    (completeMethod)="filterTeams($event)" field="name" [dropdown]="true" styleClass="w-full"
+                    placeholder="Select Team">
+                </p-autoComplete>
+            </div>
+
+            <div class="space-y-2">
+                <label for="description" class="block text-sm font-medium text-slate-700">Description</label>
+                <p-editor formControlName="description" [style]="{ height: '320px' }"></p-editor>
+            </div>
+
+            <div *ngIf="showEstimationFields()"
+                class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 pt-6">
+                <div class="space-y-2">
+                    <label for="estimatedTime" class="block text-sm font-medium text-slate-700">Estimated Time</label>
+                    <input pInputText id="estimatedTime" formControlName="estimatedTime" class="w-full"
+                        placeholder="e.g. 2 days" />
+                </div>
+                <div class="space-y-2">
+                    <label for="estimatedFinishDate" class="block text-sm font-medium text-slate-700">Estimated Finish
+                        Date</label>
+                    <p-calendar formControlName="estimatedFinishDate" styleClass="w-full"
+                        [showIcon]="true"></p-calendar>
+                </div>
+            </div>
+
+            <div *ngIf="isAdmin()" class="border-t border-slate-100 pt-6 mt-6">
+                <h3 class="text-sm font-semibold text-slate-900 mb-4">Assignment (Admin Only)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="assignedTo" class="block text-sm font-medium text-slate-700">Assignee</label>
+                        <p-autoComplete formControlName="assignedTo" [suggestions]="filteredUsers"
+                            (completeMethod)="filterUsers($event)" field="name" [dropdown]="true" styleClass="w-full"
+                            placeholder="Select User">
+                        </p-autoComplete>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4">
+                <p-button *ngIf="canAddAction()" label="Add Action" icon="pi pi-plus" [rounded]="true" severity="info"
+                    (onClick)="showActionDialog = true" class="mr-auto"></p-button>
+
+                <p-button label="Cancel" severity="secondary" routerLink="/tickets"></p-button>
+
+                <p-button *ngIf="canEdit()" label="Save Ticket" type="submit" [loading]="loading()"></p-button>
+
+                <p-button *ngIf="!canEdit() && canClose()" label="Approve & Close" icon="pi pi-check" severity="success"
+                    (onClick)="approveTicket()" [loading]="loading()"></p-button>
+            </div>
+        </form>
+
+        <!-- Action History -->
+        <div *ngIf="ticketActions.length > 0" class="mt-8 border-t border-slate-200 pt-6">
+            <p-accordion [activeIndex]="-1">
+                <p-accordionTab header="Action History">
+                    <div class="space-y-4">
+                        <div *ngFor="let action of ticketActions"
+                            class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-medium text-slate-700">{{ action.actor.name }}</span>
+                                    <span class="text-xs text-slate-500">{{ action.timestamp | date:'medium' }}</span>
+                                </div>
+                            </div>
+                            <div class="text-slate-600 text-sm" [innerHTML]="action.description"></div>
+                        </div>
+                    </div>
+                </p-accordionTab>
+            </p-accordion>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="Add Action" [(visible)]="showActionDialog" [modal]="true" [style]="{width: '50vw'}"
+    [draggable]="false" [resizable]="false">
+    <div class="flex flex-col gap-4">
+        <label for="actionDescription" class="font-semibold">Description</label>
+        <p-editor [(ngModel)]="newActionDescription" [style]="{ height: '200px' }"></p-editor>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Cancel" (click)="showActionDialog = false" styleClass="p-button-text"></p-button>
+        <p-button label="Save" (click)="saveAction()" [disabled]="!newActionDescription.trim()"></p-button>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,147 @@
+<div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
+        <p class="text-slate-500">Welcome back, {{ currentUser()?.name }}</p>
+    </div>
+
+    <div class="flex gap-3 w-full md:w-auto">
+        <span class="p-input-icon-right w-full md:w-64">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
+                placeholder="Search by Ticket #" class="w-full" />
+        </span>
+
+        <p-dropdown *ngIf="isAdmin()" [options]="teams()" [(ngModel)]="selectedTeamId" (onChange)="loadData()"
+            optionLabel="name" optionValue="id" [showClear]="true" placeholder="Filter by Team"
+            styleClass="w-full md:w-48">
+        </p-dropdown>
+
+        <p-button label="New Ticket" icon="pi pi-plus" routerLink="/tickets/new" [rounded]="true"></p-button>
+    </div>
+</div>
+
+<!-- KPIs -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-slate-500 text-sm font-medium mb-2">Total Tickets</h3>
+        <p class="text-3xl font-bold text-slate-800">{{ kpis().total }}</p>
+        <div class="mt-2 text-xs text-slate-400 flex items-center gap-1">
+            <i class="pi pi-arrow-up text-emerald-500"></i>
+            <span class="text-emerald-500 font-medium">12%</span> vs last month
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-slate-500 text-sm font-medium mb-2">Open</h3>
+        <p class="text-3xl font-bold text-indigo-600">{{ kpis().open }}</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-slate-500 text-sm font-medium mb-2">In Progress</h3>
+        <p class="text-3xl font-bold text-amber-500">{{ kpis().inProgress }}</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h3 class="text-slate-500 text-sm font-medium mb-2">Resolved</h3>
+        <p class="text-3xl font-bold text-emerald-600">{{ kpis().resolved }}</p>
+    </div>
+</div>
+
+<!-- Ticket Lists -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Admin: Last 10 Tickets / User: My In Progress -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">
+            {{ isAdmin() ? 'Recent Tickets' : 'My In Progress' }}
+        </h2>
+        <p-table [value]="primaryList()" [rows]="5" [paginator]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Ticket #</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ticket>
+                <tr>
+                    <td>{{ ticket.ticketNumber }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td><p-tag [value]="ticket.status" [severity]="getSeverity(ticket.status)"></p-tag></td>
+                    <td>
+                        <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary"
+                            [routerLink]="['/tickets', ticket.id]"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center p-4 text-slate-500">No tickets found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <!-- Admin: Team Overview? / User: My Paused & Team Tickets -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <h2 class="text-lg font-semibold text-slate-800 mb-4">
+            {{ isAdmin() ? 'Critical Tickets' : 'My Paused Tickets' }}
+        </h2>
+        <p-table [value]="secondaryList()" [rows]="5" [paginator]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Ticket #</th>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Action</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-ticket>
+                <tr>
+                    <td>{{ ticket.ticketNumber }}</td>
+                    <td>{{ ticket.title }}</td>
+                    <td><p-tag [value]="ticket.priority" [severity]="getPrioritySeverity(ticket.priority)"></p-tag></td>
+                    <td>
+                        <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary"
+                            [routerLink]="['/tickets', ticket.id]"></p-button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="text-center p-4 text-slate-500">No tickets found.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- User: Team Tickets (Full Width) -->
+<div *ngIf="!isAdmin()" class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+    <h2 class="text-lg font-semibold text-slate-800 mb-4">My Team's Tickets</h2>
+    <p-table [value]="teamTickets()" [rows]="5" [paginator]="true">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Ticket #</th>
+                <th>Title</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-ticket>
+            <tr>
+                <td>{{ ticket.ticketNumber }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.assignedTo?.name || 'Unassigned' }}</td>
+                <td><p-tag [value]="ticket.status" [severity]="getSeverity(ticket.status)"></p-tag></td>
+                <td>
+                    <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary"
+                        [routerLink]="['/tickets', ticket.id]"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="5" class="text-center p-4 text-slate-500">No tickets found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
