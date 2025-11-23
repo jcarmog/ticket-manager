@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springdoc.core.annotations.ParameterObject;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,13 +25,17 @@ public class TicketController {
 
     @GetMapping
     @Operation(summary = "Get all tickets", description = "Retrieve a list of tickets with optional filters")
-    public List<Ticket> getAllTickets(
+    public ResponseEntity<Page<Ticket>> getAllTickets(
             @RequestParam(required = false) Long assignedTo,
             @RequestParam(required = false) Long assignedTeam,
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
-            @RequestParam(required = false) Boolean assignedToMe) {
-        return ticketService.getAllTickets(assignedTo, assignedTeam, startDate, endDate, assignedToMe);
+            @RequestParam(required = false) Boolean assignedToMe,
+            @RequestParam(required = false) TicketStatus status,
+            @RequestParam(required = false) LocalDate statusChangedFrom,
+            @ParameterObject Pageable pageable) {
+        return ResponseEntity.ok(ticketService.getAllTickets(assignedTo, assignedTeam, startDate, endDate, assignedToMe,
+                status, statusChangedFrom, pageable));
     }
 
     @GetMapping("/{id}")
@@ -59,12 +66,11 @@ public class TicketController {
     @Operation(summary = "Assign ticket", description = "Assign a ticket to a user or a team")
     public Ticket assignTicket(@PathVariable Long id, @RequestParam(required = false) Long userId,
             @RequestParam(required = false) Long teamId) {
-        if (userId != null) {
-            return ticketService.assignTicket(id, userId);
-        } else if (teamId != null) {
+        if (teamId != null) {
             return ticketService.assignTicketToTeam(id, teamId);
         } else {
-            throw new IllegalArgumentException("Either userId or teamId must be provided");
+            // If userId is null, it means unassign
+            return ticketService.assignTicket(id, userId);
         }
     }
 
@@ -78,5 +84,12 @@ public class TicketController {
     public ResponseEntity<Ticket> addAction(@PathVariable Long id,
             @RequestBody com.ticketmanager.dto.AddActionRequest request) {
         return ResponseEntity.ok(ticketService.addAction(id, request.getDescription()));
+    }
+
+    @PostMapping("/fix-unassigned-status")
+    @Operation(summary = "Fix unassigned ticket statuses", description = "Fixes tickets that are unassigned but not in OPEN status")
+    public ResponseEntity<Void> fixUnassignedTicketStatuses() {
+        ticketService.fixUnassignedTicketStatuses();
+        return ResponseEntity.ok().build();
     }
 }

@@ -46,14 +46,16 @@ public class Ticket {
     @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate estimatedFinishDate;
 
+    private LocalDateTime statusUpdatedAt;
+
     @ManyToOne
     @JoinColumn(name = "created_by_id", nullable = false)
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("team")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("teams")
     private User createdBy;
 
     @ManyToOne
     @JoinColumn(name = "assigned_to_id")
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("team")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("teams")
     private User assignedTo;
 
     @ManyToOne

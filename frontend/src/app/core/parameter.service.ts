@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-export interface ApplicationParameter {
+export interface Parameter {
     id: number;
-    name: string;
-    description: string;
+    key: string;
     value: string;
 }
 
@@ -13,11 +13,11 @@ export interface ApplicationParameter {
     providedIn: 'root'
 })
 export class ParameterService {
-    private apiUrl = 'http://localhost:8080/api/parameters';
+    private apiUrl = `${environment.apiUrl}/parameters`;
 
     constructor(private http: HttpClient) { }
 
-    getParameter(name: string): Observable<ApplicationParameter> {
-        return this.http.get<ApplicationParameter>(`${this.apiUrl}/${name}`);
+    getParameter(name: string): Observable<Parameter> {
+        return this.http.get<Parameter>(`${this.apiUrl}/${name}`);
     }
 }

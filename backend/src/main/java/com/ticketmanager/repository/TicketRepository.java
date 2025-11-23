@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long>, JpaSpecificationExecutor<Ticket> {
     java.util.Optional<Ticket> findTopByTicketNumberStartingWithOrderByTicketNumberDesc(String prefix);
+
+    java.util.List<Ticket> findByAssignedToIsNullAndStatusNot(com.ticketmanager.model.TicketStatus status);
 }

@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from './auth.service';
 import { Team } from './team.service';
+import { environment } from '../../environments/environment';
 
 export type TicketStatus = 'OPEN' | 'IN_PROGRESS' | 'PAUSED' | 'RESOLVED' | 'CLOSED';
 
@@ -36,26 +37,45 @@ export interface TicketFilters {
     startDate?: string;
     endDate?: string;
     assignedToMe?: boolean;
+    status?: TicketStatus;
+    statusChangedFrom?: string;
+}
+
+export interface Page<T> {
+    content: T[];
+    totalElements: number;
+    totalPages: number;
+    size: number;
+    number: number;
 }
 
 @Injectable({
     providedIn: 'root'
 })
 export class TicketService {
-    private apiUrl = 'http://localhost:8080/api/tickets';
+    private apiUrl = `${environment.apiUrl}/tickets`;
 
     constructor(private http: HttpClient) { }
 
-    getTickets(filters?: TicketFilters): Observable<Ticket[]> {
-        let params = new HttpParams();
+    getTickets(page: number, size: number, filters?: TicketFilters, sort?: string): Observable<Page<Ticket>> {
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString());
+
+        if (sort) {
+            params = params.set('sort', sort);
+        }
+
         if (filters) {
             if (filters.assignedTo) params = params.set('assignedTo', filters.assignedTo);
             if (filters.assignedTeam) params = params.set('assignedTeam', filters.assignedTeam);
             if (filters.startDate) params = params.set('startDate', filters.startDate);
             if (filters.endDate) params = params.set('endDate', filters.endDate);
             if (filters.assignedToMe) params = params.set('assignedToMe', filters.assignedToMe);
+            if (filters.status) params = params.set('status', filters.status);
+            if (filters.statusChangedFrom) params = params.set('statusChangedFrom', filters.statusChangedFrom);
         }
-        return this.http.get<Ticket[]>(this.apiUrl, { params, withCredentials: true });
+        return this.http.get<Page<Ticket>>(this.apiUrl, { params, withCredentials: true });
     }
 
     getTicket(id: number): Observable<Ticket> {

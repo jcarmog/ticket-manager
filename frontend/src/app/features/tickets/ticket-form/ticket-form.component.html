@@ -1,7 +1,8 @@
 <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-slate-800">{{ isEditMode() ? 'Edit Ticket' : 'New Ticket' }}</h2>
+            <h2 class="text-xl font-bold text-slate-800">{{ (isEditMode() ? 'TICKET_FORM.EDIT_TITLE' :
+                'TICKET_FORM.NEW_TITLE') | translate }}</h2>
             <div class="flex gap-2">
                 <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="secondary"
                     routerLink="/tickets"></p-button>
@@ -10,54 +11,62 @@
 
         <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="space-y-6">
             <div class="space-y-2">
-                <label for="title" class="block text-sm font-medium text-slate-700">Title</label>
+                <label for="title" class="block text-sm font-medium text-slate-700">{{ 'TICKET_FORM.TITLE_LABEL' |
+                    translate }}</label>
                 <input pInputText id="title" formControlName="title" class="w-full"
-                    placeholder="Brief summary of the issue" />
+                    [placeholder]="'TICKET_FORM.TITLE_PLACEHOLDER' | translate" />
             </div>
 
             <div class="space-y-2">
-                <label for="priority" class="block text-sm font-medium text-slate-700">Priority</label>
+                <label for="priority" class="block text-sm font-medium text-slate-700">{{ 'TICKET_FORM.PRIORITY_LABEL' |
+                    translate }}</label>
                 <p-dropdown [options]="priorityOptions" formControlName="priority" optionLabel="label"
-                    optionValue="value" styleClass="w-full" placeholder="Select Priority">
+                    optionValue="value" styleClass="w-full"
+                    [placeholder]="'TICKET_FORM.PRIORITY_PLACEHOLDER' | translate">
                 </p-dropdown>
             </div>
 
             <div class="space-y-2">
-                <label for="assignedTeam" class="block text-sm font-medium text-slate-700">Team</label>
+                <label for="assignedTeam" class="block text-sm font-medium text-slate-700">{{ 'TICKET_FORM.TEAM_LABEL' |
+                    translate }}</label>
                 <p-autoComplete formControlName="assignedTeam" [suggestions]="filteredTeams"
                     (completeMethod)="filterTeams($event)" field="name" [dropdown]="true" styleClass="w-full"
-                    placeholder="Select Team">
+                    [placeholder]="'TICKET_FORM.TEAM_PLACEHOLDER' | translate">
                 </p-autoComplete>
             </div>
 
             <div class="space-y-2">
-                <label for="description" class="block text-sm font-medium text-slate-700">Description</label>
+                <label for="description" class="block text-sm font-medium text-slate-700">{{
+                    'TICKET_FORM.DESCRIPTION_LABEL' | translate }}</label>
                 <p-editor formControlName="description" [style]="{ height: '320px' }"></p-editor>
             </div>
 
             <div *ngIf="showEstimationFields()"
                 class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-slate-100 pt-6">
                 <div class="space-y-2">
-                    <label for="estimatedTime" class="block text-sm font-medium text-slate-700">Estimated Time</label>
+                    <label for="estimatedTime" class="block text-sm font-medium text-slate-700">{{
+                        'TICKET_FORM.ESTIMATED_TIME_LABEL' | translate }}</label>
                     <input pInputText id="estimatedTime" formControlName="estimatedTime" class="w-full"
-                        placeholder="e.g. 2 days" />
+                        [placeholder]="'TICKET_FORM.ESTIMATED_TIME_PLACEHOLDER' | translate" />
                 </div>
                 <div class="space-y-2">
-                    <label for="estimatedFinishDate" class="block text-sm font-medium text-slate-700">Estimated Finish
-                        Date</label>
+                    <label for="estimatedFinishDate" class="block text-sm font-medium text-slate-700">{{
+                        'TICKET_FORM.ESTIMATED_DATE_LABEL' | translate }}</label>
                     <p-calendar formControlName="estimatedFinishDate" styleClass="w-full"
                         [showIcon]="true"></p-calendar>
                 </div>
             </div>
 
             <div *ngIf="isAdmin()" class="border-t border-slate-100 pt-6 mt-6">
-                <h3 class="text-sm font-semibold text-slate-900 mb-4">Assignment (Admin Only)</h3>
+                <h3 class="text-sm font-semibold text-slate-900 mb-4">{{ 'TICKET_FORM.ASSIGNMENT_TITLE' | translate }}
+                </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label for="assignedTo" class="block text-sm font-medium text-slate-700">Assignee</label>
+                        <label for="assignedTo" class="block text-sm font-medium text-slate-700">{{
+                            'TICKET_FORM.ASSIGNEE_LABEL' | translate }}</label>
                         <p-autoComplete formControlName="assignedTo" [suggestions]="filteredUsers"
                             (completeMethod)="filterUsers($event)" field="name" [dropdown]="true" styleClass="w-full"
-                            placeholder="Select User">
+                            [placeholder]="'TICKET_FORM.ASSIGNEE_PLACEHOLDER' | translate">
                         </p-autoComplete>
                     </div>
 
@@ -66,22 +75,23 @@
             </div>
 
             <div class="flex justify-end gap-3 pt-4">
-                <p-button *ngIf="canAddAction()" label="Add Action" icon="pi pi-plus" [rounded]="true" severity="info"
-                    (onClick)="showActionDialog = true" class="mr-auto"></p-button>
+                <p-button *ngIf="canAddAction()" [label]="'TICKET_FORM.ADD_ACTION' | translate" icon="pi pi-plus"
+                    [rounded]="true" severity="info" (onClick)="showActionDialog = true" class="mr-auto"></p-button>
 
-                <p-button label="Cancel" severity="secondary" routerLink="/tickets"></p-button>
+                <p-button [label]="'ACTIONS.CANCEL' | translate" severity="secondary" routerLink="/tickets"></p-button>
 
-                <p-button *ngIf="canEdit()" label="Save Ticket" type="submit" [loading]="loading()"></p-button>
+                <p-button *ngIf="canEdit()" [label]="'TICKET_FORM.SAVE' | translate" type="submit"
+                    [loading]="loading()"></p-button>
 
-                <p-button *ngIf="!canEdit() && canClose()" label="Approve & Close" icon="pi pi-check" severity="success"
-                    (onClick)="approveTicket()" [loading]="loading()"></p-button>
+                <p-button *ngIf="!canEdit() && canClose()" [label]="'TICKET_FORM.APPROVE_CLOSE' | translate"
+                    icon="pi pi-check" severity="success" (onClick)="approveTicket()" [loading]="loading()"></p-button>
             </div>
         </form>
 
         <!-- Action History -->
         <div *ngIf="ticketActions.length > 0" class="mt-8 border-t border-slate-200 pt-6">
             <p-accordion [activeIndex]="-1">
-                <p-accordionTab header="Action History">
+                <p-accordionTab [header]="'TICKET_FORM.ACTION_HISTORY' | translate">
                     <div class="space-y-4">
                         <div *ngFor="let action of ticketActions"
                             class="bg-slate-50 p-4 rounded-lg border border-slate-100">
@@ -100,14 +110,16 @@
     </div>
 </div>
 
-<p-dialog header="Add Action" [(visible)]="showActionDialog" [modal]="true" [style]="{width: '50vw'}"
-    [draggable]="false" [resizable]="false">
+<p-dialog [header]="'TICKET_FORM.DIALOG_ADD_ACTION' | translate" [(visible)]="showActionDialog" [modal]="true"
+    [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
     <div class="flex flex-col gap-4">
-        <label for="actionDescription" class="font-semibold">Description</label>
+        <label for="actionDescription" class="font-semibold">{{ 'TICKET_FORM.DIALOG_DESC' | translate }}</label>
         <p-editor [(ngModel)]="newActionDescription" [style]="{ height: '200px' }"></p-editor>
     </div>
     <ng-template pTemplate="footer">
-        <p-button label="Cancel" (click)="showActionDialog = false" styleClass="p-button-text"></p-button>
-        <p-button label="Save" (click)="saveAction()" [disabled]="!newActionDescription.trim()"></p-button>
+        <p-button [label]="'ACTIONS.CANCEL' | translate" (click)="showActionDialog = false"
+            styleClass="p-button-text"></p-button>
+        <p-button [label]="'ACTIONS.CONFIRM' | translate" (click)="saveAction()"
+            [disabled]="!newActionDescription.trim()"></p-button>
     </ng-template>
 </p-dialog>

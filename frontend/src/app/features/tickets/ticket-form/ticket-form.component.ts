@@ -16,6 +16,7 @@ import { AutoCompleteModule, AutoCompleteCompleteEvent } from 'primeng/autocompl
 import { DialogModule } from 'primeng/dialog';
 import { AccordionModule } from 'primeng/accordion';
 import { TicketAction } from '../../../core/ticket.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-ticket-form',
@@ -33,7 +34,8 @@ import { TicketAction } from '../../../core/ticket.service';
     CalendarModule,
     AutoCompleteModule,
     DialogModule,
-    AccordionModule
+    AccordionModule,
+    TranslateModule
   ],
 
   templateUrl: './ticket-form.component.html'
@@ -53,10 +55,7 @@ export class TicketFormComponent implements OnInit {
 
   statuses: TicketStatus[] = ['OPEN', 'IN_PROGRESS', 'PAUSED', 'RESOLVED', 'CLOSED'];
 
-  priorityOptions = Object.keys(TICKET_PRIORITY_DESCRIPTIONS).map(key => ({
-    label: TICKET_PRIORITY_DESCRIPTIONS[key],
-    value: key
-  }));
+  priorityOptions: { label: string, value: string }[] = [];
 
   filteredUsers: User[] = [];
   filteredTeams: Team[] = [];
@@ -68,7 +67,8 @@ export class TicketFormComponent implements OnInit {
     private teamService: TeamService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private translate: TranslateService
   ) {
     this.ticketForm = this.fb.group({
       title: ['', Validators.required],
@@ -87,6 +87,16 @@ export class TicketFormComponent implements OnInit {
     // We can just read it directly or use an effect if we needed to react to changes.
     // But here we just need to load users and teams.
     this.loadUsersAndTeams();
+
+    const keys = Object.keys(TICKET_PRIORITY_DESCRIPTIONS);
+    const translationKeys = keys.map(key => `TICKET.PRIORITY_LABEL.${key}`);
+
+    this.translate.get(translationKeys).subscribe(translations => {
+      this.priorityOptions = keys.map(key => ({
+        label: translations[`TICKET.PRIORITY_LABEL.${key}`],
+        value: key
+      }));
+    });
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -141,8 +151,21 @@ export class TicketFormComponent implements OnInit {
 
     this.loading.set(true);
     const formValue = this.ticketForm.value;
+
+    // Format date to yyyy-MM-dd
+    let formattedDate = null;
+    if (formValue.estimatedFinishDate instanceof Date) {
+      const year = formValue.estimatedFinishDate.getFullYear();
+      const month = String(formValue.estimatedFinishDate.getMonth() + 1).padStart(2, '0');
+      const day = String(formValue.estimatedFinishDate.getDate()).padStart(2, '0');
+      formattedDate = `${year}-${month}-${day}`;
+    } else {
+      formattedDate = formValue.estimatedFinishDate;
+    }
+
     const ticketData = {
       ...formValue,
+      estimatedFinishDate: formattedDate
       // If creating, we might not send ID. If editing, we use the ID from route.
     };
 

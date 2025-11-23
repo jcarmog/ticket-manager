@@ -5,11 +5,12 @@ import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
 import { AuthService } from '../../core/auth.service';
 import { ParameterService } from '../../core/parameter.service';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule, ButtonModule, MessageModule],
+  imports: [CommonModule, ButtonModule, MessageModule, TranslateModule],
   templateUrl: './landing-page.component.html'
 })
 export class LandingPageComponent implements OnInit {
@@ -19,13 +20,16 @@ export class LandingPageComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private parameterService: ParameterService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private translate: TranslateService
   ) { }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       if (params['error'] === 'inactive') {
-        this.errorMessage.set('Access to the system was not permitted. Please contact the system administrator.');
+        this.translate.get('LANDING.ERROR_INACTIVE').subscribe(msg => {
+          this.errorMessage.set(msg);
+        });
       }
     });
 

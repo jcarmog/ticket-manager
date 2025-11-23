@@ -37,7 +37,7 @@ public class Team {
 
     @OneToOne
     @JoinColumn(name = "leader_id")
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("team")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("teams")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private User leader;

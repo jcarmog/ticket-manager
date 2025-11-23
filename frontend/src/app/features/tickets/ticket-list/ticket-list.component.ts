@@ -20,11 +20,12 @@ import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { AvatarModule } from 'primeng/avatar';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-ticket-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TableModule, ButtonModule, TagModule, DialogModule, DropdownModule, FormsModule, TooltipModule, SelectButtonModule, AccordionModule, CalendarModule, InputTextModule, InputTextareaModule, AvatarModule],
+  imports: [CommonModule, RouterLink, TableModule, ButtonModule, TagModule, DialogModule, DropdownModule, FormsModule, TooltipModule, SelectButtonModule, AccordionModule, CalendarModule, InputTextModule, InputTextareaModule, AvatarModule, TranslateModule],
   templateUrl: './ticket-list.component.html'
 })
 export class TicketListComponent implements OnInit {
@@ -45,50 +46,141 @@ export class TicketListComponent implements OnInit {
   ticketStatuses: string[] = ['OPEN', 'IN_PROGRESS', 'PAUSED', 'RESOLVED', 'CLOSED'];
   activeIndices: number[] = [];
 
+  // State per status
+  ticketsByStatus: { [key: string]: Ticket[] } = {};
+  totalRecordsByStatus: { [key: string]: number } = {};
+  loadingByStatus: { [key: string]: boolean } = {};
+
+  startDialogVisible = false;
+  estimation = { time: '', date: null as Date | null };
+  minDate = new Date();
+
+  pauseDialogVisible = false;
+  pauseReason = '';
+
   constructor(
     private ticketService: TicketService,
     private authService: AuthService,
-    private teamService: TeamService
-  ) { }
-
-  ngOnInit() {
-    this.loadTickets();
+    private teamService: TeamService,
+    private translate: TranslateService
+  ) {
+    // Initialize state for each status
+    this.ticketStatuses.forEach(status => {
+      this.ticketsByStatus[status] = [];
+      this.totalRecordsByStatus[status] = 0;
+      this.loadingByStatus[status] = false;
+    });
   }
 
-  loadTickets() {
-    const filters = this.currentFilter === 'MY' ? { assignedToMe: true } : {};
-    this.ticketService.getTickets(filters).subscribe(tickets => {
-      // Sort by Priority (Critical=0 -> Low=3) and CreatedAt Desc
-      // Priority is string in frontend, need map
-      const priorityMap: { [key: string]: number } = { 'CRITICAL': 0, 'HIGH': 1, 'MEDIUM': 2, 'LOW': 3 };
+  ngOnInit() {
+    // Load teams based on user role
+    if (this.isAdmin()) {
+      // Admin sees all teams
+      this.teamService.getTeams().subscribe(teams => this.teams.set(teams));
+    } else {
+      // Non-admin sees only their teams
+      const user = this.currentUser();
+      if (user && user.teams) {
+        this.teams.set(user.teams as Team[]);
+      }
+    }
 
-      const sorted = tickets.sort((a, b) => {
-        const pA = priorityMap[a.priority] ?? 99;
-        const pB = priorityMap[b.priority] ?? 99;
-        if (pA !== pB) return pA - pB;
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      });
-      this.tickets.set(sorted);
-
-      // Calculate active indices based on tickets presence
-      this.activeIndices = this.ticketStatuses
-        .map((status, index) => this.getTicketsByStatus(status).length > 0 ? index : -1)
-        .filter(index => index !== -1);
+    this.translate.get(['TICKET_LIST.FILTER_ALL', 'TICKET_LIST.FILTER_MY']).subscribe(translations => {
+      this.filterOptions = [
+        { label: translations['TICKET_LIST.FILTER_ALL'], value: 'ALL' },
+        { label: translations['TICKET_LIST.FILTER_MY'], value: 'MY' }
+      ];
     });
 
-    this.teamService.getTeams().subscribe(teams => this.teams.set(teams));
+    this.initializeTicketCounts();
+  }
+
+  // Helper to check admin role
+  isAdmin(): boolean {
+    return this.currentUser()?.role === 'ADMIN';
+  }
+
+  // Show team filter if admin OR if user belongs to more than one team
+  shouldShowTeamFilter(): boolean {
+    if (this.isAdmin()) {
+      return true;
+    }
+    const user = this.currentUser();
+    return (user?.teams?.length || 0) > 1;
+  }
+
+  initializeTicketCounts() {
+    this.activeIndices = []; // Start with all collapsed
+    this.ticketStatuses.forEach((status, index) => {
+      // Reset tickets for this status when filters change
+      this.ticketsByStatus[status] = [];
+      this.loadingByStatus[status] = true;
+      const filters: any = { status: status };
+      if (this.currentFilter === 'MY') {
+        filters.assignedToMe = true;
+      }
+      // Admin team filter
+      if (this.isAdmin() && this.selectedTeamId) {
+        filters.assignedTeam = this.selectedTeamId;
+      }
+      console.log('Filters for status', status, filters);
+      if (status === 'RESOLVED' || status === 'CLOSED') {
+        filters.statusChangedFrom = new Date().toISOString().split('T')[0];
+      }
+
+      // Fetch just 1 record to get the total count
+      this.ticketService.getTickets(0, 1, filters, 'createdAt,desc').subscribe(pageData => {
+        this.totalRecordsByStatus[status] = pageData.totalElements;
+        this.loadingByStatus[status] = false;
+
+        // If there are tickets, expand the tab
+        if (pageData.totalElements > 0) {
+          this.activeIndices = [...this.activeIndices, index];
+          this.activeIndices.sort((a, b) => a - b);
+        }
+      });
+    });
+  }
+
+  // Load tickets for a given status and pagination
+  loadTicketsForStatus(status: string, page: number, size: number): void {
+    this.loadingByStatus[status] = true;
+    const filters: any = { status };
+    if (this.currentFilter === 'MY') {
+      filters.assignedToMe = true;
+    }
+    if (this.isAdmin() && this.selectedTeamId) {
+      filters.assignedTeam = this.selectedTeamId;
+    }
+    if (status === 'RESOLVED' || status === 'CLOSED') {
+      filters.statusChangedFrom = new Date().toISOString().split('T')[0];
+    }
+    const sort = 'createdAt,desc';
+    this.ticketService.getTickets(page, size, filters, sort).subscribe(pageData => {
+      this.ticketsByStatus[status] = pageData.content;
+      this.totalRecordsByStatus[status] = pageData.totalElements;
+      this.loadingByStatus[status] = false;
+    });
+  }
+
+  // General loadTickets method handling initial load and pagination events
+  loadTickets(event?: any, status?: string): void {
+    // If called without args (e.g., after filter change), reload counts and first page for each status
+    if (!event && !status) {
+      this.initializeTicketCounts();
+      this.ticketStatuses.forEach(s => this.loadTicketsForStatus(s, 0, 10));
+      return;
+    }
+    // When pagination event occurs for a specific status tab
+    if (event && status) {
+      const page = event.first / event.rows;
+      const size = event.rows;
+      this.loadTicketsForStatus(status, page, size);
+    }
   }
 
   getTicketsByStatus(status: string): Ticket[] {
-    return this.tickets().filter(t => t.status === status);
-  }
-
-  getVisibleTicketsByStatus(status: string): Ticket[] {
-    const tickets = this.getTicketsByStatus(status);
-    if (status === 'RESOLVED' || status === 'CLOSED') {
-      return tickets.slice(0, 5);
-    }
-    return tickets;
+    return this.ticketsByStatus[status] || [];
   }
 
   getStatusLabel(status: string): string {
@@ -132,8 +224,6 @@ export class TicketListComponent implements OnInit {
         return false;
       }
     }
-    // If ticket has team but user has no team (and not admin), cannot assign
-    // Logic covered above: if userTeams is empty, isTeamMember is false.
 
     return ticket.assignedTo?.id !== user.id;
   }
@@ -148,8 +238,6 @@ export class TicketListComponent implements OnInit {
   }
 
   canStart(ticket: Ticket): boolean {
-    // Can start if status is not IN_PROGRESS, RESOLVED, or CLOSED
-    // And if user can assign to themselves (or is already assigned to them)
     const user = this.currentUser();
     if (!user) return false;
 
@@ -170,10 +258,6 @@ export class TicketListComponent implements OnInit {
     return true;
   }
 
-  startDialogVisible = false;
-  estimation = { time: '', date: null as Date | null };
-  minDate = new Date();
-
   startTicket(ticket: Ticket) {
     this.selectedTicket = ticket;
     this.estimation = { time: '', date: null };
@@ -187,14 +271,10 @@ export class TicketListComponent implements OnInit {
     const user = this.currentUser();
     if (!user) return;
 
-    // 1. Update Ticket with Estimation
-    // 2. Assign (if needed)
-    // 3. Update Status
-
-    // Helper to format date as YYYY-MM-DD for backend (if needed, or send Date object if service handles it)
-    // Angular HttpClient handles Date objects usually by serializing to ISO string. 
-    // Backend expects LocalDate. ISO string "yyyy-MM-dd" works best.
-    const dateStr = this.estimation.date.toISOString().split('T')[0];
+    const year = this.estimation.date.getFullYear();
+    const month = String(this.estimation.date.getMonth() + 1).padStart(2, '0');
+    const day = String(this.estimation.date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
 
     const updateDetails = {
       estimatedTime: this.estimation.time,
@@ -219,9 +299,6 @@ export class TicketListComponent implements OnInit {
     return ticket.status === 'IN_PROGRESS';
   }
 
-  pauseDialogVisible = false;
-  pauseReason = '';
-
   openPauseDialog(ticket: Ticket) {
     this.selectedTicket = ticket;
     this.pauseReason = '';
@@ -238,71 +315,22 @@ export class TicketListComponent implements OnInit {
   }
 
   canUnassign(ticket: Ticket): boolean {
-    // "The user can unsign a ticket, when it occurs the ticket must back to the team"
-    // Assuming user can unassign if assigned to them OR if they are admin?
-    // Requirement: "The user can unsign a ticket"
     const user = this.currentUser();
     if (!user) return false;
 
     // If assigned to me, I can unassign
     if (ticket.assignedTo?.id === user.id) return true;
 
-    // If admin, can unassign anyone? Probably.
+    // If admin, can unassign anyone
     if (user.role === 'ADMIN' && ticket.assignedTo) return true;
 
     return false;
   }
 
   unassign(ticket: Ticket) {
-    // Unassign means clearing assignedTo. 
-    // If it was assigned to a team before, does it go back?
-    // Backend logic: assignTicket(id, userId) clears team.
-    // assignTicketToTeam(id, teamId) clears user.
-    // To "unassign" user and "back to team", we need to know the team.
-    // But the ticket might not have a team if it was assigned directly to user?
-    // Requirement: "when it occurs the ticket must back to the team"
-    // This implies the ticket SHOULD belong to a team.
-    // If we unassign user, we should check if we can revert to team.
-    // But currently `assignedTeam` is cleared when `assignedTo` is set in backend.
-    // So we lost the team info?
-    // Ah, `assignedTeam` is cleared in `assignTicket` method in backend: `ticket.setAssignedTeam(null);`.
-    // This is a problem if we want to "back to team".
-    // We might need to keep `assignedTeam` even if `assignedTo` is set, to know which team it belongs to.
-    // Or `assignedTo` user must belong to the team?
-    // Let's assume for now we just clear `assignedTo` and if the user is in a team, maybe we assign to that team?
-    // Or maybe we should NOT clear `assignedTeam` in backend when assigning to user?
-    // If I change backend logic to NOT clear `assignedTeam`, then `assignedTo` is just the person working on it, but it still belongs to the team.
-    // This makes more sense for "back to team".
-    // I will update backend logic later or now?
-    // For now, let's just clear assignedTo. If backend clears team, then it goes to "Unassigned".
-    // If the requirement is strict, I should update backend.
-    // "The user can unsign a ticket, when it occurs the ticket must back to the team"
-    // This strongly suggests `assignedTeam` should persist.
-
-    // I'll proceed with frontend changes and then maybe fix backend if needed.
-    // For now, I'll just call assignTicket with null? No, assignTicket requires userId.
-    // I need an endpoint to unassign? Or pass null?
-    // `assignTicket` takes `userId`. If I pass null? Backend expects `Long userId`.
-    // I might need a new endpoint or update `assignTicket` to accept null.
-
-    // Actually, "The user can 'forward' ticket only to another team".
-    // "The user can unsign a ticket".
-
-    // Let's implement `unassign` by calling `assignTicket` with null?
-    // My backend `assignTicket` throws if user not found.
-    // I need to update backend to allow unassigning.
-
-    // Wait, I can use `assignTicketToTeam` if I know the team.
-    // But I don't know the team if it was cleared.
-
-    // I will assume for this step that I just need to implement the UI.
-    // I'll add a TODO to fix backend logic regarding team persistence.
-
-    // For now, I'll just show a message or something, or try to assign to the user's team?
-    // Let's just try to assign to the current user's team if they have one?
-    // Or just leave it unassigned.
-
-    // Actually, I'll implement `forward` first.
+    this.ticketService.assignTicket(ticket.id, undefined, undefined).subscribe(() => {
+      this.loadTickets();
+    });
   }
 
   openForwardDialog(ticket: Ticket) {

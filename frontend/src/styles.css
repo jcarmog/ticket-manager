@@ -6,3 +6,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Toast Resize */
+.p-toast {
+    width: 650px !important;
+    max-width: 90vw !important;
+}
+
+.p-toast-message-text {
+    word-break: break-word;
+}

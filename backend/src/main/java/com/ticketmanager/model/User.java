@@ -32,6 +32,10 @@ public class User {
     @Builder.Default
     private boolean active = true;
 
+    @Column(length = 10)
+    @Builder.Default
+    private String preferredLanguage = "pt-BR";
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_teams", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "team_id"))
     @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "members", "leader" })

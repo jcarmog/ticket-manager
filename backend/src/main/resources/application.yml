@@ -1,11 +1,42 @@
+server:
+  port: 8080 # Added default port (optional, but good practice)
+  servlet:
+    session:
+      timeout: 60m
+
 spring:
   application:
     name: ticket-manager
+
+  messages:
+    basename: i18n/messages
+
+  # Mail Configuration
+  mail:
+    host: localhost
+    port: 1025
+    # Uses environment variable if set, otherwise defaults to the value after the colon
+    username: ${MAIL_USERNAME:no-reply@ticketmanager.com}
+    password: ${MAIL_PASSWORD:hello}
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+
+  # Database Configuration
   datasource:
-    url: jdbc:mysql://192.168.0.154:3306/ticket_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    url: jdbc:mysql://localhost:3306/ticket_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # JPA/Hibernate Configuration
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,27 +45,30 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+
+  # Security / OAuth2 Configuration
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            # SECURITY NOTE: It is best practice to remove the hardcoded keys
+            # and only use ${GOOGLE_CLIENT_ID} in production files.
+            client-id: ${GOOGLE_CLIENT_ID:972791132937-3isnetor9a0u9ub2ip40n08jl2h1mj5h.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET: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}
             scope:
               - email
               - profile
-        #   azure-active-directory:
-        #     client-id: ${AZURE_CLIENT_ID:placeholder}
-        #     client-secret: ${AZURE_CLIENT_SECRET:placeholder}
-        #     scope:
-        #       - openid
-        #       - profile
-        #       - email
-        # provider:
-        #   azure-active-directory:
-        #     issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID:placeholder}/v2.0
+          # Un-comment below to add Azure AD support later
+          # azure-active-directory:
+          #   client-id: ${AZURE_CLIENT_ID:placeholder}
+          #   client-secret: ${AZURE_CLIENT_SECRET:placeholder}
+          #   scope:
+          #     - openid
+          #     - profile
+          #     - email
 
+# Swagger / OpenAPI Configuration
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -42,6 +76,7 @@ springdoc:
   api-docs:
     path: /v3/api-docs
 
+# Actuator Configuration
 management:
   endpoints:
     web:

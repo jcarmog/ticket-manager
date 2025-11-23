@@ -1,45 +1,64 @@
 <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>
-        <p class="text-slate-500">Welcome back, {{ currentUser()?.name }}</p>
+        <h1 class="text-2xl font-bold text-slate-800">{{ 'DASHBOARD.TITLE' | translate }}</h1>
+        <p class="text-slate-500">{{ 'APP.WELCOME' | translate }}, {{ currentUser()?.name }}</p>
     </div>
 
     <div class="flex gap-3 w-full md:w-auto">
         <span class="p-input-icon-right w-full md:w-64">
             <i class="pi pi-search"></i>
             <input pInputText type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
-                placeholder="Search by Ticket #" class="w-full" />
+                [placeholder]="'DASHBOARD.SEARCH_PLACEHOLDER' | translate" class="w-full" />
         </span>
 
         <p-dropdown *ngIf="isAdmin()" [options]="teams()" [(ngModel)]="selectedTeamId" (onChange)="loadData()"
-            optionLabel="name" optionValue="id" [showClear]="true" placeholder="Filter by Team"
+            optionLabel="name" optionValue="id" [showClear]="true" [placeholder]="'DASHBOARD.FILTER_TEAM' | translate"
             styleClass="w-full md:w-48">
         </p-dropdown>
 
-        <p-button label="New Ticket" icon="pi pi-plus" routerLink="/tickets/new" [rounded]="true"></p-button>
+        <p-button [label]="'DASHBOARD.NEW_TICKET' | translate" icon="pi pi-plus" routerLink="/tickets/new"
+            [rounded]="true"></p-button>
     </div>
+</div>
+
+<!-- Status Distribution -->
+<div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+    <h3 class="text-slate-500 text-sm font-medium mb-4">{{ 'DASHBOARD.STATUS_DISTRIBUTION' | translate }} ({{
+        currentDate
+        | date:'MMMM' }})</h3>
+    <p-meterGroup [value]="meterGroupValues()">
+        <ng-template pTemplate="label">
+            <div class="flex flex-wrap gap-4 mt-4">
+                <div *ngFor="let item of meterGroupValues()" class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full" [style.backgroundColor]="item.color"></span>
+                    <span class="text-slate-600 text-sm font-medium">{{ item.label | translate }}</span>
+                    <span class="text-slate-400 text-sm">({{ item.value | number:'1.0-0' }}%)</span>
+                </div>
+            </div>
+        </ng-template>
+    </p-meterGroup>
 </div>
 
 <!-- KPIs -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-slate-500 text-sm font-medium mb-2">Total Tickets</h3>
+        <h3 class="text-slate-500 text-sm font-medium mb-2">{{ 'DASHBOARD.TOTAL_TICKETS' | translate }}</h3>
         <p class="text-3xl font-bold text-slate-800">{{ kpis().total }}</p>
         <div class="mt-2 text-xs text-slate-400 flex items-center gap-1">
-            <i class="pi pi-arrow-up text-emerald-500"></i>
-            <span class="text-emerald-500 font-medium">12%</span> vs last month
+            <i class="pi {{ growthIcon() }} {{ growthColor() }}"></i>
+            <span class="{{ growthColor() }} font-medium">{{ totalGrowth() | number:'1.0-2' }}%</span> vs last month
         </div>
     </div>
     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-slate-500 text-sm font-medium mb-2">Open</h3>
+        <h3 class="text-slate-500 text-sm font-medium mb-2">{{ 'DASHBOARD.OPEN' | translate }}</h3>
         <p class="text-3xl font-bold text-indigo-600">{{ kpis().open }}</p>
     </div>
     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-slate-500 text-sm font-medium mb-2">In Progress</h3>
+        <h3 class="text-slate-500 text-sm font-medium mb-2">{{ 'DASHBOARD.IN_PROGRESS' | translate }}</h3>
         <p class="text-3xl font-bold text-amber-500">{{ kpis().inProgress }}</p>
     </div>
     <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h3 class="text-slate-500 text-sm font-medium mb-2">Resolved</h3>
+        <h3 class="text-slate-500 text-sm font-medium mb-2">{{ 'DASHBOARD.RESOLVED' | translate }}</h3>
         <p class="text-3xl font-bold text-emerald-600">{{ kpis().resolved }}</p>
     </div>
 </div>
@@ -49,22 +68,23 @@
     <!-- Admin: Last 10 Tickets / User: My In Progress -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <h2 class="text-lg font-semibold text-slate-800 mb-4">
-            {{ isAdmin() ? 'Recent Tickets' : 'My In Progress' }}
+            {{ (isAdmin() ? 'DASHBOARD.RECENT_TICKETS' : 'DASHBOARD.MY_IN_PROGRESS') | translate }}
         </h2>
         <p-table [value]="primaryList()" [rows]="5" [paginator]="true">
             <ng-template pTemplate="header">
                 <tr>
-                    <th>Ticket #</th>
-                    <th>Title</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>{{ 'TICKET.NUMBER' | translate }}</th>
+                    <th>{{ 'TICKET.TITLE' | translate }}</th>
+                    <th>{{ 'TICKET.STATUS' | translate }}</th>
+                    <th>{{ 'TICKET.ACTION' | translate }}</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-ticket>
                 <tr>
                     <td>{{ ticket.ticketNumber }}</td>
                     <td>{{ ticket.title }}</td>
-                    <td><p-tag [value]="ticket.status" [severity]="getSeverity(ticket.status)"></p-tag></td>
+                    <td><p-tag [value]="'TICKET.STATUS_LABEL.' + ticket.status | translate"
+                            [severity]="getSeverity(ticket.status)"></p-tag></td>
                     <td>
                         <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary"
                             [routerLink]="['/tickets', ticket.id]"></p-button>
@@ -73,7 +93,7 @@
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="4" class="text-center p-4 text-slate-500">No tickets found.</td>
+                    <td colspan="4" class="text-center p-4 text-slate-500">{{ 'DASHBOARD.NO_TICKETS' | translate }}</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -82,22 +102,23 @@
     <!-- Admin: Team Overview? / User: My Paused & Team Tickets -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
         <h2 class="text-lg font-semibold text-slate-800 mb-4">
-            {{ isAdmin() ? 'Critical Tickets' : 'My Paused Tickets' }}
+            {{ (isAdmin() ? 'DASHBOARD.CRITICAL_TICKETS' : 'DASHBOARD.MY_PAUSED') | translate }}
         </h2>
         <p-table [value]="secondaryList()" [rows]="5" [paginator]="true">
             <ng-template pTemplate="header">
                 <tr>
-                    <th>Ticket #</th>
-                    <th>Title</th>
-                    <th>Priority</th>
-                    <th>Action</th>
+                    <th>{{ 'TICKET.NUMBER' | translate }}</th>
+                    <th>{{ 'TICKET.TITLE' | translate }}</th>
+                    <th>{{ 'TICKET.PRIORITY' | translate }}</th>
+                    <th>{{ 'TICKET.ACTION' | translate }}</th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-ticket>
                 <tr>
                     <td>{{ ticket.ticketNumber }}</td>
                     <td>{{ ticket.title }}</td>
-                    <td><p-tag [value]="ticket.priority" [severity]="getPrioritySeverity(ticket.priority)"></p-tag></td>
+                    <td><p-tag [value]="'TICKET.PRIORITY_LABEL.' + ticket.priority | translate"
+                            [severity]="getPrioritySeverity(ticket.priority)"></p-tag></td>
                     <td>
                         <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary"
                             [routerLink]="['/tickets', ticket.id]"></p-button>
@@ -106,7 +127,7 @@
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="4" class="text-center p-4 text-slate-500">No tickets found.</td>
+                    <td colspan="4" class="text-center p-4 text-slate-500">{{ 'DASHBOARD.NO_TICKETS' | translate }}</td>
                 </tr>
             </ng-template>
         </p-table>
@@ -115,23 +136,24 @@
 
 <!-- User: Team Tickets (Full Width) -->
 <div *ngIf="!isAdmin()" class="mt-6 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-    <h2 class="text-lg font-semibold text-slate-800 mb-4">My Team's Tickets</h2>
+    <h2 class="text-lg font-semibold text-slate-800 mb-4">{{ 'DASHBOARD.MY_TEAM_TICKETS' | translate }}</h2>
     <p-table [value]="teamTickets()" [rows]="5" [paginator]="true">
         <ng-template pTemplate="header">
             <tr>
-                <th>Ticket #</th>
-                <th>Title</th>
-                <th>Assigned To</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th>{{ 'TICKET.NUMBER' | translate }}</th>
+                <th>{{ 'TICKET.TITLE' | translate }}</th>
+                <th>{{ 'TICKET.ASSIGNED_TO' | translate }}</th>
+                <th>{{ 'TICKET.STATUS' | translate }}</th>
+                <th>{{ 'TICKET.ACTION' | translate }}</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-ticket>
             <tr>
                 <td>{{ ticket.ticketNumber }}</td>
                 <td>{{ ticket.title }}</td>
-                <td>{{ ticket.assignedTo?.name || 'Unassigned' }}</td>
-                <td><p-tag [value]="ticket.status" [severity]="getSeverity(ticket.status)"></p-tag></td>
+                <td>{{ ticket.assignedTo?.name || ('TICKET_LIST.UNASSIGNED' | translate) }}</td>
+                <td><p-tag [value]="'TICKET.STATUS_LABEL.' + ticket.status | translate"
+                        [severity]="getSeverity(ticket.status)"></p-tag></td>
                 <td>
                     <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary"
                         [routerLink]="['/tickets', ticket.id]"></p-button>
@@ -140,7 +162,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <tr>
-                <td colspan="5" class="text-center p-4 text-slate-500">No tickets found.</td>
+                <td colspan="5" class="text-center p-4 text-slate-500">{{ 'DASHBOARD.NO_TICKETS' | translate }}</td>
             </tr>
         </ng-template>
     </p-table>

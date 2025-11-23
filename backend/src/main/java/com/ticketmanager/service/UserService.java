@@ -41,9 +41,20 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.setName(userDetails.getName());
-        user.setRole(userDetails.getRole());
+        // Only update fields that are not null
+        if (userDetails.getName() != null) {
+            user.setName(userDetails.getName());
+        }
+        if (userDetails.getRole() != null) {
+            user.setRole(userDetails.getRole());
+        }
+        // Handle active field separately since it's a primitive boolean
         user.setActive(userDetails.isActive());
+
+        // Update preferred language if provided
+        if (userDetails.getPreferredLanguage() != null) {
+            user.setPreferredLanguage(userDetails.getPreferredLanguage());
+        }
 
         if (teamIds != null) {
             List<Team> teams = teamRepository.findAllById(teamIds);

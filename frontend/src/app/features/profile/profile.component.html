@@ -1,7 +1,7 @@
 <div class="p-6">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-slate-900">My Profile</h1>
-        <p class="text-slate-600">Manage your account settings and view your teams.</p>
+        <h1 class="text-2xl font-bold text-slate-900">{{ 'PROFILE.TITLE' | translate }}</h1>
+        <p class="text-slate-600">{{ 'PROFILE.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -28,15 +28,23 @@
 
                 <div class="mt-6 pt-6 border-t border-slate-100">
                     <div class="flex justify-between items-center mb-2">
-                        <span class="text-slate-600">Status</span>
+                        <span class="text-slate-600">{{ 'PROFILE.STATUS' | translate }}</span>
                         <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
                             [ngClass]="user()?.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
-                            {{ user()?.active ? 'Active' : 'Inactive' }}
+                            {{ (user()?.active ? 'PROFILE.ACTIVE' : 'PROFILE.INACTIVE') | translate }}
                         </span>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-slate-600">User ID</span>
-                        <span class="text-slate-900 font-mono text-sm">#{{ user()?.id }}</span>
+                    <div class="flex flex-col mb-4">
+                        <span class="text-sm text-slate-500 mb-1">{{ 'PROFILE.USER_ID' | translate }}</span>
+                        <span class="font-mono text-slate-700 bg-slate-100 px-2 py-1 rounded w-fit">#{{ user()?.id
+                            }}</span>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <span class="text-sm text-slate-500 mb-1">{{ 'PROFILE.LANGUAGE' | translate }}</span>
+                        <p-dropdown [options]="languageOptions" [(ngModel)]="language" (onChange)="onLanguageChange()"
+                            optionLabel="label" optionValue="value" styleClass="w-full md:w-48">
+                        </p-dropdown>
                     </div>
                 </div>
             </div>
@@ -45,11 +53,11 @@
         <!-- Teams Card -->
         <div class="md:col-span-2">
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h3 class="text-lg font-semibold text-slate-900 mb-4">My Teams</h3>
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">{{ 'PROFILE.MY_TEAMS' | translate }}</h3>
 
                 <div *ngIf="!user()?.teams?.length"
                     class="text-center py-8 text-slate-500 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                    You are not a member of any team yet.
+                    {{ 'PROFILE.NO_TEAMS' | translate }}
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -62,7 +70,7 @@
                             </div>
                             <div>
                                 <h4 class="font-medium text-slate-900">{{ team.name }}</h4>
-                                <span class="text-xs text-slate-500">Team Member</span>
+                                <span class="text-xs text-slate-500">{{ 'PROFILE.TEAM_MEMBER' | translate }}</span>
                             </div>
                         </div>
                     </div>

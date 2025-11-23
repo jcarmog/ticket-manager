@@ -11,7 +11,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 import org.hibernate.envers.Audited;
-import org.hibernate.envers.Audited;
 
 @Entity
 @Table(name = "ticket_actions")
@@ -36,7 +35,7 @@ public class TicketAction {
 
     @ManyToOne
     @JoinColumn(name = "actor_id", nullable = false)
-    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("team")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("teams")
     private User actor;
 
     @CreationTimestamp

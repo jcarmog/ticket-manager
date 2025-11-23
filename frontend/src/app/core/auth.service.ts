@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, of, map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface User {
     id: number;
@@ -10,13 +11,14 @@ export interface User {
     role: 'ADMIN' | 'USER';
     teams?: { id: number; name: string }[];
     active?: boolean;
+    preferredLanguage?: string;
 }
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private apiUrl = 'http://localhost:8080/api/users/me';
+    private apiUrl = `${environment.apiUrl}/users/me`;
     currentUser = signal<User | null>(null);
     private initialized = false;
 
@@ -42,7 +44,7 @@ export class AuthService {
     }
 
     login(provider: string = 'google'): void {
-        window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
+        window.location.href = `${environment.apiUrl.replace('/api', '')}/oauth2/authorization/${provider}`;
     }
 
     logout(): void {
