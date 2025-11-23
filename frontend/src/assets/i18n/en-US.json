@@ -1,0 +1,137 @@
+{
+    "APP": {
+        "NAME": "Ticket Manager",
+        "LOGOUT": "Logout",
+        "WELCOME": "Welcome back"
+    },
+    "MENU": {
+        "DASHBOARD": "Dashboard",
+        "TICKETS": "Tickets",
+        "TEAMS": "Teams",
+        "USERS": "Users"
+    },
+    "DASHBOARD": {
+        "TITLE": "Dashboard",
+        "SEARCH_PLACEHOLDER": "Search by Ticket #",
+        "FILTER_TEAM": "Filter by Team",
+        "NEW_TICKET": "New Ticket",
+        "STATUS_DISTRIBUTION": "Ticket distributed by Status",
+        "TOTAL_TICKETS": "Total Tickets",
+        "OPEN": "Open",
+        "IN_PROGRESS": "In Progress",
+        "RESOLVED": "Resolved",
+        "RECENT_TICKETS": "Recent Tickets",
+        "MY_IN_PROGRESS": "My In Progress",
+        "CRITICAL_TICKETS": "Critical Tickets",
+        "MY_PAUSED": "My Paused",
+        "MY_TEAM_TICKETS": "My Team's Tickets",
+        "NO_TICKETS": "No tickets found."
+    },
+    "TICKET": {
+        "NUMBER": "Ticket #",
+        "TITLE": "Title",
+        "STATUS": "Status",
+        "PRIORITY": "Priority",
+        "ASSIGNED_TO": "Assigned To",
+        "CREATED_BY": "Created By",
+        "ACTION": "Action",
+        "STATUS_LABEL": {
+            "OPEN": "Open",
+            "IN_PROGRESS": "In Progress",
+            "PAUSED": "Paused",
+            "RESOLVED": "Resolved",
+            "CLOSED": "Closed"
+        },
+        "PRIORITY_LABEL": {
+            "CRITICAL": "Critical",
+            "HIGH": "High",
+            "MEDIUM": "Medium",
+            "LOW": "Low"
+        }
+    },
+    "TICKET_LIST": {
+        "TITLE": "Tickets",
+        "NEW_TICKET": "New Ticket",
+        "FILTER_ALL": "All Tickets",
+        "FILTER_MY": "My Tickets",
+        "NO_TICKETS_STATUS": "No tickets in this status.",
+        "CREATED_AT": "Created At",
+        "FILTER_TEAM": "Filter by Team",
+        "TEAM": "Team",
+        "ACTIONS": "Actions",
+        "UNASSIGNED": "Unassigned"
+    },
+    "ACTIONS": {
+        "VIEW": "View Ticket",
+        "START": "Start Progress",
+        "PAUSE": "Pause Ticket",
+        "ASSIGN_ME": "Assign to Me",
+        "UNASSIGN": "Unassign",
+        "FORWARD": "Forward Ticket",
+        "CANCEL": "Cancel",
+        "CONFIRM": "Confirm"
+    },
+    "DIALOG": {
+        "FORWARD_TITLE": "Forward Ticket",
+        "SELECT_TEAM": "Select a Team",
+        "START_TITLE": "Start Ticket",
+        "START_MSG": "Please provide estimation details to start this ticket.",
+        "ESTIMATED_TIME": "Estimated Time (e.g. 2h, 3d)",
+        "ESTIMATED_DATE": "Estimated Completion Date",
+        "PAUSE_TITLE": "Pause Ticket",
+        "PAUSE_MSG": "Please provide a reason for pausing this ticket.",
+        "REASON": "Reason"
+    },
+    "TICKET_FORM": {
+        "EDIT_TITLE": "Edit Ticket",
+        "NEW_TITLE": "New Ticket",
+        "TITLE_LABEL": "Title",
+        "TITLE_PLACEHOLDER": "Brief summary of the issue",
+        "PRIORITY_LABEL": "Priority",
+        "PRIORITY_PLACEHOLDER": "Select Priority",
+        "TEAM_LABEL": "Team",
+        "TEAM_PLACEHOLDER": "Select Team",
+        "DESCRIPTION_LABEL": "Description",
+        "ESTIMATED_TIME_LABEL": "Estimated Time",
+        "ESTIMATED_TIME_PLACEHOLDER": "e.g. 2 days",
+        "ESTIMATED_DATE_LABEL": "Estimated Completion Date",
+        "ASSIGNMENT_TITLE": "Assignment (Admin Only)",
+        "ASSIGNEE_LABEL": "Assigned To",
+        "ASSIGNEE_PLACEHOLDER": "Select User",
+        "ADD_ACTION": "Add Action",
+        "SAVE": "Save Ticket",
+        "APPROVE_CLOSE": "Approve & Close",
+        "ACTION_HISTORY": "Action History",
+        "DIALOG_ADD_ACTION": "Add Action",
+        "DIALOG_DESC": "Description"
+    },
+    "PROFILE": {
+        "TITLE": "My Profile",
+        "SUBTITLE": "Manage your account settings and view your teams.",
+        "STATUS": "Status",
+        "ACTIVE": "Active",
+        "INACTIVE": "Inactive",
+        "USER_ID": "User ID",
+        "MY_TEAMS": "My Teams",
+        "NO_TEAMS": "You are not a member of any team yet.",
+        "TEAM_MEMBER": "Team Member",
+        "LANGUAGE": "Language",
+        "PORTUGUESE": "Portuguese",
+        "ENGLISH": "English"
+    },
+    "LANDING": {
+        "TITLE": "Ticket Manager",
+        "SUBTITLE": "Manage your team's work efficiently.",
+        "ERROR_INACTIVE": "Access to the system was not permitted. Please contact the system administrator.",
+        "SIGN_IN_GOOGLE": "Sign in with Google",
+        "SIGN_IN_MICROSOFT": "Sign in with Microsoft",
+        "SIGN_IN_GITHUB": "Sign in with GitHub",
+        "SIGN_IN_GITLAB": "Sign in with GitLab",
+        "SIGN_IN_FACEBOOK": "Sign in with Facebook",
+        "COPYRIGHT": "© 2025 Ticket Manager. All rights reserved."
+    },
+    "NOTIFICATIONS": {
+        "TITLE": "Notifications",
+        "EMPTY": "No new notifications"
+    }
+}

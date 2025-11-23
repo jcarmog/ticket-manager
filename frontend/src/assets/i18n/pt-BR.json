@@ -1,0 +1,137 @@
+{
+    "APP": {
+        "NAME": "Ticket Manager",
+        "LOGOUT": "Sair",
+        "WELCOME": "Bem-vindo de volta"
+    },
+    "MENU": {
+        "DASHBOARD": "Dashboard",
+        "TICKETS": "Chamados",
+        "TEAMS": "Times",
+        "USERS": "Usuários"
+    },
+    "DASHBOARD": {
+        "TITLE": "Dashboard",
+        "SEARCH_PLACEHOLDER": "Buscar por Nº do Chamado",
+        "FILTER_TEAM": "Filtrar por Time",
+        "NEW_TICKET": "Novo Chamado",
+        "STATUS_DISTRIBUTION": "Chamados distribuídos por Status",
+        "TOTAL_TICKETS": "Total de Chamados",
+        "OPEN": "Abertos",
+        "IN_PROGRESS": "Em Andamento",
+        "RESOLVED": "Resolvidos",
+        "RECENT_TICKETS": "Chamados Recentes",
+        "MY_IN_PROGRESS": "Meus em Andamento",
+        "CRITICAL_TICKETS": "Chamados Críticos",
+        "MY_PAUSED": "Meus Pausados",
+        "MY_TEAM_TICKETS": "Chamados do Meu Time",
+        "NO_TICKETS": "Nenhum chamado encontrado."
+    },
+    "TICKET": {
+        "NUMBER": "Nº Chamado",
+        "TITLE": "Título",
+        "STATUS": "Status",
+        "PRIORITY": "Prioridade",
+        "ASSIGNED_TO": "Atribuído a",
+        "CREATED_BY": "Criado por",
+        "ACTION": "Ação",
+        "STATUS_LABEL": {
+            "OPEN": "Aberto",
+            "IN_PROGRESS": "Em Andamento",
+            "PAUSED": "Pausado",
+            "RESOLVED": "Resolvido",
+            "CLOSED": "Fechado"
+        },
+        "PRIORITY_LABEL": {
+            "CRITICAL": "Crítica",
+            "HIGH": "Alta",
+            "MEDIUM": "Média",
+            "LOW": "Baixa"
+        }
+    },
+    "TICKET_LIST": {
+        "TITLE": "Chamados",
+        "NEW_TICKET": "Novo Chamado",
+        "FILTER_ALL": "Todos os Chamados",
+        "FILTER_MY": "Meus Chamados",
+        "NO_TICKETS_STATUS": "Nenhum chamado neste status.",
+        "CREATED_AT": "Criado em",
+        "FILTER_TEAM": "Filtrar por Time",
+        "TEAM": "Time",
+        "ACTIONS": "Ações",
+        "UNASSIGNED": "Não atribuído"
+    },
+    "ACTIONS": {
+        "VIEW": "Ver Chamado",
+        "START": "Iniciar Progresso",
+        "PAUSE": "Pausar Chamado",
+        "ASSIGN_ME": "Atribuir a Mim",
+        "UNASSIGN": "Remover Atribuição",
+        "FORWARD": "Encaminhar Chamado",
+        "CANCEL": "Cancelar",
+        "CONFIRM": "Confirmar"
+    },
+    "DIALOG": {
+        "FORWARD_TITLE": "Encaminhar Chamado",
+        "SELECT_TEAM": "Selecione um Time",
+        "START_TITLE": "Iniciar Chamado",
+        "START_MSG": "Por favor, forneça os detalhes da estimativa para iniciar este chamado.",
+        "ESTIMATED_TIME": "Tempo Estimado (ex: 2h, 3d)",
+        "ESTIMATED_DATE": "Data Estimada de Conclusão",
+        "PAUSE_TITLE": "Pausar Chamado",
+        "PAUSE_MSG": "Por favor, forneça uma justificativa para pausar este chamado.",
+        "REASON": "Motivo"
+    },
+    "TICKET_FORM": {
+        "EDIT_TITLE": "Editar Chamado",
+        "NEW_TITLE": "Novo Chamado",
+        "TITLE_LABEL": "Título",
+        "TITLE_PLACEHOLDER": "Breve resumo do problema",
+        "PRIORITY_LABEL": "Prioridade",
+        "PRIORITY_PLACEHOLDER": "Selecione a Prioridade",
+        "TEAM_LABEL": "Time",
+        "TEAM_PLACEHOLDER": "Selecione o Time",
+        "DESCRIPTION_LABEL": "Descrição",
+        "ESTIMATED_TIME_LABEL": "Tempo Estimado",
+        "ESTIMATED_TIME_PLACEHOLDER": "ex: 2 dias",
+        "ESTIMATED_DATE_LABEL": "Data Estimada de Conclusão",
+        "ASSIGNMENT_TITLE": "Atribuição (Apenas Admin)",
+        "ASSIGNEE_LABEL": "Atribuído a",
+        "ASSIGNEE_PLACEHOLDER": "Selecione o Usuário",
+        "ADD_ACTION": "Adicionar Ação",
+        "SAVE": "Salvar Chamado",
+        "APPROVE_CLOSE": "Aprovar & Fechar",
+        "ACTION_HISTORY": "Histórico de Ações",
+        "DIALOG_ADD_ACTION": "Adicionar Ação",
+        "DIALOG_DESC": "Descrição"
+    },
+    "PROFILE": {
+        "TITLE": "Meu Perfil",
+        "SUBTITLE": "Gerencie as configurações da sua conta e veja seus times.",
+        "STATUS": "Status",
+        "ACTIVE": "Ativo",
+        "INACTIVE": "Inativo",
+        "USER_ID": "ID do Usuário",
+        "MY_TEAMS": "Meus Times",
+        "NO_TEAMS": "Você ainda não é membro de nenhum time.",
+        "TEAM_MEMBER": "Membro do Time",
+        "LANGUAGE": "Idioma",
+        "PORTUGUESE": "Português",
+        "ENGLISH": "Inglês"
+    },
+    "LANDING": {
+        "TITLE": "Ticket Manager",
+        "SUBTITLE": "Gerencie o trabalho da sua equipe com eficiência.",
+        "ERROR_INACTIVE": "O acesso ao sistema não foi permitido. Entre em contato com o administrador do sistema.",
+        "SIGN_IN_GOOGLE": "Entrar com Google",
+        "SIGN_IN_MICROSOFT": "Entrar com Microsoft",
+        "SIGN_IN_GITHUB": "Entrar com GitHub",
+        "SIGN_IN_GITLAB": "Entrar com GitLab",
+        "SIGN_IN_FACEBOOK": "Entrar com Facebook",
+        "COPYRIGHT": "© 2025 Ticket Manager. Todos os direitos reservados."
+    },
+    "NOTIFICATIONS": {
+        "TITLE": "Notificações",
+        "EMPTY": "Nenhuma nova notificação"
+    }
+}
