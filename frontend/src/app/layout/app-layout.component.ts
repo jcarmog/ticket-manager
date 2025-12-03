@@ -26,10 +26,21 @@ import { Router } from '@angular/router';
 export class AppLayoutComponent implements OnInit, OnDestroy {
   notifications = signal<Notification[]>([]);
   sidebarCollapsed = signal<boolean>(false);
+  mobileSidebarOpen = signal<boolean>(false);
   private pollingInterval: any;
 
   toggleSidebar() {
-    this.sidebarCollapsed.update(v => !v);
+    // On desktop (md and up), we toggle the collapsed state
+    // On mobile, we toggle the visibility
+    if (window.innerWidth >= 768) {
+      this.sidebarCollapsed.update(v => !v);
+    } else {
+      this.mobileSidebarOpen.update(v => !v);
+    }
+  }
+
+  closeMobileSidebar() {
+    this.mobileSidebarOpen.set(false);
   }
 
   constructor(

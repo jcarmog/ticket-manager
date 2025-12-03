@@ -8,11 +8,13 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
 import { Team, TeamService } from '../../../core/team.service';
 
 import { TooltipModule } from 'primeng/tooltip';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-team-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TableModule, ButtonModule, AvatarModule, AvatarGroupModule, TooltipModule],
+  imports: [CommonModule, RouterLink, TableModule, ButtonModule, AvatarModule, AvatarGroupModule, TooltipModule, MenuModule],
   templateUrl: './team-list.component.html'
 })
 export class TeamListComponent implements OnInit {
@@ -34,5 +36,22 @@ export class TeamListComponent implements OnInit {
   toggleInactive() {
     this.showInactive.update(v => !v);
     this.loadTeams();
+  }
+
+  items: MenuItem[] = [];
+
+  showMenu(menu: any, event: MouseEvent, team: Team) {
+    this.items = this.getTeamActions(team);
+    menu.toggle(event);
+  }
+
+  getTeamActions(team: Team): MenuItem[] {
+    return [
+      {
+        label: 'Edit Team',
+        icon: 'pi pi-pencil',
+        routerLink: ['/teams', team.id]
+      }
+    ];
   }
 }

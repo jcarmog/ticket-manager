@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextarea } from 'primeng/inputtextarea';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
@@ -19,7 +19,7 @@ import { User } from '../../../core/auth.service';
     ReactiveFormsModule,
     RouterLink,
     InputTextModule,
-    InputTextareaModule,
+    InputTextarea,
     MultiSelectModule,
     DropdownModule,
     ButtonModule

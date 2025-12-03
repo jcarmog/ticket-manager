@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextarea } from 'primeng/inputtextarea';
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { TicketService, TicketStatus, TICKET_STATUS_DESCRIPTIONS, TICKET_PRIORITY_DESCRIPTIONS } from '../../../core/ticket.service';
@@ -27,7 +27,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     FormsModule,
     RouterLink,
     InputTextModule,
-    InputTextareaModule,
+    InputTextarea,
     DropdownModule,
     ButtonModule,
     EditorModule,

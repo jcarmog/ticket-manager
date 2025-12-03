@@ -6,6 +6,8 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { Ticket, TicketService, TICKET_STATUS_DESCRIPTIONS, TICKET_PRIORITY_DESCRIPTIONS } from '../../../core/ticket.service';
 import { AuthService, User } from '../../../core/auth.service';
@@ -18,14 +20,14 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { AccordionModule } from 'primeng/accordion';
 import { CalendarModule } from 'primeng/calendar';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputTextarea } from 'primeng/inputtextarea';
 import { AvatarModule } from 'primeng/avatar';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-ticket-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, TableModule, ButtonModule, TagModule, DialogModule, DropdownModule, FormsModule, TooltipModule, SelectButtonModule, AccordionModule, CalendarModule, InputTextModule, InputTextareaModule, AvatarModule, TranslateModule],
+  imports: [CommonModule, RouterLink, TableModule, ButtonModule, TagModule, DialogModule, DropdownModule, FormsModule, TooltipModule, SelectButtonModule, AccordionModule, CalendarModule, InputTextModule, InputTextarea, AvatarModule, TranslateModule, MenuModule],
   templateUrl: './ticket-list.component.html'
 })
 export class TicketListComponent implements OnInit {
@@ -191,10 +193,10 @@ export class TicketListComponent implements OnInit {
     return TICKET_PRIORITY_DESCRIPTIONS[priority] || priority;
   }
 
-  getSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {
+  getSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
     switch (status) {
       case 'OPEN': return 'info';
-      case 'IN_PROGRESS': return 'warning';
+      case 'IN_PROGRESS': return 'warn';
       case 'PAUSED': return 'secondary';
       case 'RESOLVED': return 'success';
       case 'CLOSED': return 'contrast';
@@ -202,10 +204,10 @@ export class TicketListComponent implements OnInit {
     }
   }
 
-  getPrioritySeverity(priority: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {
+  getPrioritySeverity(priority: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
     switch (priority) {
       case 'CRITICAL': return 'danger';
-      case 'HIGH': return 'warning';
+      case 'HIGH': return 'warn';
       case 'MEDIUM': return 'info';
       case 'LOW': return 'success';
       default: return undefined;
@@ -346,5 +348,68 @@ export class TicketListComponent implements OnInit {
       this.forwardDialogVisible = false;
       this.loadTickets();
     });
+  }
+
+  items: MenuItem[] = [];
+
+  showMenu(menu: any, event: MouseEvent, ticket: Ticket) {
+    this.items = this.getTicketActions(ticket);
+    menu.toggle(event);
+  }
+
+  getTicketActions(ticket: Ticket): MenuItem[] {
+    const actions: MenuItem[] = [];
+
+    // View Action (Always available)
+    actions.push({
+      label: this.translate.instant('ACTIONS.VIEW'),
+      icon: 'pi pi-eye',
+      routerLink: ['/tickets', ticket.id]
+    });
+
+    // Start Action
+    if (this.canStart(ticket)) {
+      actions.push({
+        label: this.translate.instant('ACTIONS.START'),
+        icon: 'pi pi-play',
+        command: () => this.startTicket(ticket)
+      });
+    }
+
+    // Pause Action
+    if (this.canPause(ticket)) {
+      actions.push({
+        label: this.translate.instant('ACTIONS.PAUSE'),
+        icon: 'pi pi-pause',
+        command: () => this.openPauseDialog(ticket)
+      });
+    }
+
+    // Assign to Me Action
+    if (this.canAssignToMe(ticket)) {
+      actions.push({
+        label: this.translate.instant('ACTIONS.ASSIGN_ME'),
+        icon: 'pi pi-user-plus',
+        command: () => this.assignToMe(ticket)
+      });
+    }
+
+    // Unassign Action
+    if (this.canUnassign(ticket)) {
+      actions.push({
+        label: this.translate.instant('ACTIONS.UNASSIGN'),
+        icon: 'pi pi-user-minus',
+        command: () => this.unassign(ticket)
+      });
+    }
+
+    // Forward Action (Always available if not closed?) - logic from template was just always available
+    actions.push({
+      label: this.translate.instant('ACTIONS.FORWARD'),
+      icon: 'pi pi-arrow-right',
+      command: () => this.openForwardDialog(ticket)
+    });
+
+    return actions;
   }
 }

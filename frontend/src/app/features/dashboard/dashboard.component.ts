@@ -190,10 +190,10 @@ export class DashboardComponent implements OnInit {
     return this.currentUser()?.role === 'ADMIN';
   }
 
-  getSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {
+  getSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
     switch (status) {
       case 'OPEN': return 'info';
-      case 'IN_PROGRESS': return 'warning';
+      case 'IN_PROGRESS': return 'warn';
       case 'PAUSED': return 'secondary';
       case 'RESOLVED': return 'success';
       case 'CLOSED': return 'contrast';
@@ -201,10 +201,10 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  getPrioritySeverity(priority: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' | undefined {
+  getPrioritySeverity(priority: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' | undefined {
     switch (priority) {
       case 'CRITICAL': return 'danger';
-      case 'HIGH': return 'warning';
+      case 'HIGH': return 'warn';
       case 'MEDIUM': return 'info';
       case 'LOW': return 'success';
       default: return undefined;

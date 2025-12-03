@@ -1,3 +1,4 @@
+<p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold text-slate-800">Teams</h2>
@@ -45,8 +46,8 @@
                     </p-avatarGroup>
                 </td>
                 <td>
-                    <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
-                        [routerLink]="['/teams', team.id]" pTooltip="Edit Team" tooltipPosition="top"></p-button>
+                    <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="secondary"
+                        (click)="showMenu(menu, $event, team)"></p-button>
                 </td>
             </tr>
         </ng-template>

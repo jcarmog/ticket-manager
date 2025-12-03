@@ -1,15 +1,17 @@
+<p-menu #menu [model]="items" [popup]="true" appendTo="body"></p-menu>
 <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-    <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto">
             <h2 class="text-xl font-bold text-slate-800">{{ 'TICKET_LIST.TITLE' | translate }}</h2>
             <p-dropdown *ngIf="shouldShowTeamFilter()" [options]="teams()" [(ngModel)]="selectedTeamId"
                 optionLabel="name" optionValue="id" placeholder="{{ 'TICKET_LIST.FILTER_TEAM' | translate }}"
-                (onChange)="loadTickets()" class="ml-4"></p-dropdown>
+                (onChange)="loadTickets()" class="w-full md:w-auto md:ml-4" styleClass="w-full md:w-48"></p-dropdown>
             <p-selectButton [options]="filterOptions" [(ngModel)]="currentFilter" optionLabel="label"
-                optionValue="value" (onChange)="loadTickets()">
+                optionValue="value" (onChange)="loadTickets()" styleClass="w-full md:w-auto">
             </p-selectButton>
         </div>
-        <p-button [label]="'TICKET_LIST.NEW_TICKET' | translate" icon="pi pi-plus" routerLink="/tickets/new"></p-button>
+        <p-button [label]="'TICKET_LIST.NEW_TICKET' | translate" icon="pi pi-plus" routerLink="/tickets/new"
+            styleClass="w-full md:w-auto"></p-button>
     </div>
 
     <p-accordion [multiple]="true" [(activeIndex)]="activeIndices">
@@ -65,30 +67,9 @@
                         </td>
                         <td>{{ ticket.createdAt | date:'mediumDate' }}</td>
                         <td>
-                            <div class="flex gap-3">
-                                <p-button icon="pi pi-eye" [rounded]="true" [outlined]="true" severity="secondary"
-                                    [routerLink]="['/tickets', ticket.id]" [pTooltip]="'ACTIONS.VIEW' | translate"
-                                    tooltipPosition="top"></p-button>
-
-                                <p-button *ngIf="canStart(ticket)" icon="pi pi-play" [rounded]="true" severity="success"
-                                    (click)="startTicket(ticket)" [pTooltip]="'ACTIONS.START' | translate"
-                                    tooltipPosition="top"></p-button>
-
-                                <p-button *ngIf="canPause(ticket)" icon="pi pi-pause" [rounded]="true"
-                                    severity="warning" (click)="openPauseDialog(ticket)"
-                                    [pTooltip]="'ACTIONS.PAUSE' | translate" tooltipPosition="top"></p-button>
-
-                                <p-button *ngIf="canAssignToMe(ticket)" icon="pi pi-user-plus" [rounded]="true"
-                                    severity="info" (click)="assignToMe(ticket)"
-                                    [pTooltip]="'ACTIONS.ASSIGN_ME' | translate" tooltipPosition="top"></p-button>
-
-                                <p-button *ngIf="canUnassign(ticket)" icon="pi pi-user-minus" [rounded]="true"
-                                    [outlined]="true" severity="danger" (click)="unassign(ticket)"
-                                    [pTooltip]="'ACTIONS.UNASSIGN' | translate" tooltipPosition="top"></p-button>
-
-                                <p-button icon="pi pi-arrow-right" [rounded]="true" [outlined]="true"
-                                    severity="secondary" (click)="openForwardDialog(ticket)"
-                                    [pTooltip]="'ACTIONS.FORWARD' | translate" tooltipPosition="top"></p-button>
+                            <div class="flex justify-center">
+                                <p-button icon="pi pi-ellipsis-v" [rounded]="true" [text]="true" severity="secondary"
+                                    (click)="showMenu(menu, $event, ticket)"></p-button>
                             </div>
                         </td>
                     </tr>
