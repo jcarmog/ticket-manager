@@ -6,7 +6,7 @@ A full-stack ticket management application built with Angular and Java (Jakarta 
 
 ```text
 ticket-manager/
-├── frontend/     # Angular 17.3.0 application
+├── frontend/     # Angular 18 application
 ├── backend/      # Java backend with Jakarta EE and Spring
 └── README.md
 ````
@@ -15,12 +15,13 @@ ticket-manager/
 
 ### Frontend
 
-- **Framework**: Angular 17.3.0
+- **Framework**: Angular 18.2.14
 - **Language**: TypeScript 5.4.2
-- **UI Components**: PrimeNG 17.18.15
+- **UI Components**: PrimeNG 18.0.2
 - **Styling**:
     - TailwindCSS 3.4.18
     - PrimeIcons 7.0.0
+    - PrimeNG Aura Theme
 - **Rich Text Editor**: Quill 2.0.3
 - **State Management**: RxJS 7.8.0
 
@@ -229,13 +230,4 @@ podman exec -it mysql-ticket-manager mysql -u root -proot ticket_manager
 
 ``````
 
----
-
-### Changes Made
-1.  **Merged Sections:** The "MailDev Setup" was previously separated by a broken code block (` ````` `). I removed the artifact and integrated the section into the main flow (placed before "Getting Started" so all infrastructure is ready before running the app).
-2.  **Fixed Headers:** Removed the backslashes from headers (e.g., changed `1\.` to `1.`) for cleaner rendering.
-3.  **Code Fences:** Ensured all code blocks start and end with exactly three backticks (` ``` `).
-4.  **Docker Command Update:** Added the `-d` (detach) flag and `--name` to the MailDev Docker command so it runs in the background like your database.
-
-Would you like me to generate a `docker-compose.yml` file so you can spin up the **Database**, **MailDev**, and **Backend** all at once with a single command?
-``````
+```
